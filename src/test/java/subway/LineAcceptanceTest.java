@@ -24,13 +24,17 @@ import subway.line.LineRequest;
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class LineAcceptanceTest {
+    private Long stationId1;
+    private Long stationId2;
+    private Long stationId3;
+    private Long stationId4;
 
     @BeforeEach
     void init() {
-        createStation("station1");
-        createStation("station2");
-        createStation("station3");
-        createStation("station4");
+        stationId1 = getStationId(createStation("station1"));
+        stationId2 = getStationId(createStation("station2"));
+        stationId3 = getStationId(createStation("station3"));
+        stationId4 = getStationId(createStation("station4"));
     }
 
     /**
@@ -42,9 +46,9 @@ class LineAcceptanceTest {
     @Test
     void testCreateLine() {
         // Given
-        String newLineName = "Line1";
+        String newLineName = "사당";
         // When
-        ExtractableResponse<Response> response = createLine(new LineRequest(newLineName, "red", 1L, 2L, 10L));
+        ExtractableResponse<Response> response = createLine(new LineRequest(newLineName, "red", stationId1, stationId2, 10L));
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -62,10 +66,10 @@ class LineAcceptanceTest {
     @Test
     void testGetAllLine() {
         // Given
-        String lineName1 = "Line1";
-        String lineName2 = "Line2";
-        createLine(new LineRequest(lineName1, "red", 1L, 2L, 10L));
-        createLine(new LineRequest(lineName2, "blue", 3L, 4L, 10L));
+        String lineName1 = "사당";
+        String lineName2 = "방배";
+        createLine(new LineRequest(lineName1, "red", stationId1, stationId2, 10L));
+        createLine(new LineRequest(lineName2, "blue", stationId3, stationId4, 10L));
         // When
         ExtractableResponse<Response> lineInfo = getAllLines();
         // Then
@@ -82,8 +86,8 @@ class LineAcceptanceTest {
     @Test
     void testGetLine() {
         // Given
-        String lineName1 = "Line1";
-        ExtractableResponse<Response> response = createLine(new LineRequest(lineName1, "red", 1L, 2L, 10L));
+        String lineName1 = "사당";
+        ExtractableResponse<Response> response = createLine(new LineRequest(lineName1, "red", stationId1, stationId2, 10L));
         // When
         String url = response.response().getHeader("Location");
         ExtractableResponse<Response> lineInfo = getLine(url);
@@ -101,9 +105,9 @@ class LineAcceptanceTest {
     @Test
     void testUpdateLine() {
         // Given
-        String previousLineName = "Line1";
-        String newLineName = "Line2";
-        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(previousLineName, "red", 1L, 2L, 10L));
+        String previousLineName = "사당";
+        String newLineName = "방배";
+        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(previousLineName, "red", stationId1, stationId2, 10L));
         // When
         Map<String, String> updateLineInfoParam = Map.of("name", newLineName, "color", "red");
         updateLine(updateLineInfoParam, 1L);
@@ -122,8 +126,8 @@ class LineAcceptanceTest {
     @Test
     void testRemoveLine() {
         // Given
-        String lineName1 = "Line1";
-        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(lineName1, "red", 1L, 2L, 10L));
+        String lineName1 = "사당";
+        ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(lineName1, "red", stationId1, stationId2, 10L));
         // When
         String url = createLineResponse.response().getHeader("Location");
         deleteStation(url);
@@ -133,14 +137,19 @@ class LineAcceptanceTest {
         assertThat(allLineNames).doesNotContain(lineName1);
     }
 
-    void createStation(String stationName) {
+    ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> station = Map.of("name", stationName);
-        RestAssured.given().log().all()
-                   .body(station)
-                   .contentType(MediaType.APPLICATION_JSON_VALUE)
-                   .when().post("/stations")
-                   .then().log().all()
-                   .extract();
+        return RestAssured.given().log().all()
+                          .body(station)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().post("/stations")
+                          .then().log().all()
+                          .extract();
+    }
+
+    Long getStationId(ExtractableResponse<Response> stationCreationResponse) {
+        Integer stationId = stationCreationResponse.body().jsonPath().get("id");
+        return stationId.longValue();
     }
 
     ExtractableResponse<Response> createLine(LineRequest lineRequest) {

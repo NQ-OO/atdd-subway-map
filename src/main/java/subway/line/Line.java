@@ -1,12 +1,14 @@
 package subway.line;
 
-import java.util.Objects;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import subway.station.Station;
 
 @Entity
 public class Line {
@@ -20,22 +22,24 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Long upStationId;
+    @ManyToOne
+    @JoinColumn(name = "up_station_id", nullable = false)
+    private Station upStation;
 
-    @Column(nullable = false)
-    private Long downStationId;
+    @ManyToOne
+    @JoinColumn(name = "down_station_id", nullable = false)
+    private Station downStation;
 
     @Column(nullable = false)
     private Long distance;
 
     public Line() {}
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -51,53 +55,17 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public void updateLine(LineRequest lineRequest) {
-        if (Objects.nonNull(lineRequest.getName())) {
-            setName(lineRequest.getName());
-        }
-        if (Objects.nonNull(lineRequest.getColor())) {
-            setColor(lineRequest.getColor());
-        }
-        if (Objects.nonNull(lineRequest.getUpStationId())) {
-            setUpStationId(lineRequest.getUpStationId());
-        }
-        if (Objects.nonNull(lineRequest.getDownStationId())) {
-            setDownStationId(lineRequest.getDownStationId());
-        }
-        if (Objects.nonNull(lineRequest.getDistance())) {
-            setDistance(lineRequest.getDistance());
-        }
+        name = lineRequest.getName();
+        color = lineRequest.getColor();
     }
 
-    private void setName(String name) {
-        this.name = name;
-    }
-
-    private void setColor(String color) {
-        this.color = color;
-    }
-
-    private void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
-    }
-
-    private void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
-    }
-
-    private void setDistance(Long distance) {
-        this.distance = distance;
-    }
 }
