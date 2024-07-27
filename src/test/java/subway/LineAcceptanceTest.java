@@ -110,7 +110,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> createLineResponse = createLine(new LineRequest(previousLineName, "red", stationId1, stationId2, 10L));
         // When
         Map<String, String> updateLineInfoParam = Map.of("name", newLineName, "color", "red");
-        updateLine(updateLineInfoParam, 1L);
+        updateLine(updateLineInfoParam, stationId1);
         // Then
         ExtractableResponse<Response> lineInfo = getLine(createLineResponse.response().getHeader("Location"));
         String lineName = lineInfo.body().jsonPath().get("name");
