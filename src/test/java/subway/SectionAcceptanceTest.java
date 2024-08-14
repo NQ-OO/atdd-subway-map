@@ -41,7 +41,7 @@ class SectionAcceptanceTest {
 
     /**
      * Given: 새로운 지하철 구간 정보를 입력하고,
-     * When: 지하철 구간을 생셩하면
+     * When: 지하철 구간을 생성하면
      * Then: 해당 구간이 노선에 추가된다.
      */
     @DisplayName("지하철 구간 추가 성공")
@@ -81,7 +81,7 @@ class SectionAcceptanceTest {
 
     /**
      * Given: 새로운 구간의 하행역이 해당 노선에 이미 등록되어 있을 때,
-     * When: 지하철 구간을 생셩하면
+     * When: 지하철 구간을 생성하면
      * Then: 예외가 발생한다.
      */
 
@@ -99,6 +99,32 @@ class SectionAcceptanceTest {
     Map<String, Object> givenParameterWithDuplicateDownStationInfo() {
         return Map.of("downStationId", stationId1, "upStationId", stationId2, "distance", 10);
     }
+
+    /**
+     * Given: 지하철 노선에 두 개 이상의 구간이 등록 되어있고, 제거하려는 구간(section)이 노선의 하행 종점역일 때,
+     * When: 구간을 제거하면
+     * Then: 구간이 정상적으로 제거된다.
+     */
+
+    /**
+     * Given: 지하철 노선에 한개의 구간 만 갖고 있을 때,
+     * When: 구간을 제거하면
+     * Then: 오류가 발생한다.
+     */
+
+    /**
+     * Given: 제거하려는 구간이 노선의 마지막 구간이 아닐 때,
+     * When: 구간을 제거하면
+     * Then: 오류가 발생한다.
+     */
+
+
+
+
+
+
+
+
 
     ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> station = Map.of("name", stationName);
