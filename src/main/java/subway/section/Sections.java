@@ -7,12 +7,14 @@ import java.util.Set;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import subway.station.Station;
 
 @Embeddable
 public class Sections {
     @OneToMany
+    @OrderBy("id ASC")
     private List<Section> sections;
 
     public Sections(Section section) {
@@ -40,6 +42,20 @@ public class Sections {
         sections.add(section);
     }
 
+    public Section getLastSection() {
+        return sections.get(size() - 1);
+    }
+
+    public int size() {
+        return sections.size();
+    }
+
+    public Section deleteSection() {
+        Section lastSection = getLastSection();
+        sections.remove(lastSection);
+        return lastSection;
+    }
+
     private void validationCheck(Section section, Station lineDownStation) {
         checkConnectivity(section.getUpStation(), lineDownStation);
         checkIfThereAreNoDuplicateStation(section.getDownStation());
@@ -47,7 +63,7 @@ public class Sections {
 
     private void checkConnectivity(Station sectionUpStation, Station lineDownStation) {
         if (!sectionUpStation.equals(lineDownStation)) {
-            throw new IllegalStateException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니디");
+            throw new IllegalStateException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
         }
     }
 

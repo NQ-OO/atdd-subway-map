@@ -84,4 +84,18 @@ public class Line {
         setDownStation(section.getDownStation());
     }
 
+    public Section deleteSection(Station station) {
+        if (!isRemovableSection(station)) {
+            throw new IllegalStateException("구간을 제거할 수 없습니다.");
+        }
+        Section deletedSection = sections.deleteSection();
+        setDownStation(deletedSection.getUpStation());
+        return deletedSection;
+    }
+
+    private boolean isRemovableSection(Station station) {
+        Section lastSection = sections.getLastSection();
+        return sections.size() > 1 && lastSection.getDownStation().equals(station);
+    }
+
 }

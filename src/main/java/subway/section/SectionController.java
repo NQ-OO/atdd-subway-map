@@ -3,9 +3,11 @@ package subway.section;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import subway.line.LineResponse;
@@ -13,7 +15,7 @@ import subway.line.LineResponse;
 @RestController
 public class SectionController {
 
-    private SectionService sectionService;
+    private final SectionService sectionService;
 
     public SectionController(SectionService sectionService) {
         this.sectionService = sectionService;
@@ -29,4 +31,13 @@ public class SectionController {
         }
     }
 
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
+        try {
+            sectionService.deleteSection(lineId, stationId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

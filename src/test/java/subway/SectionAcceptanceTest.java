@@ -198,7 +198,7 @@ class SectionAcceptanceTest {
 
     ExtractableResponse<Response> deleteSection(Long stationId) {
         return RestAssured.given().log().all()
-                          .when().delete("/lines/" + lineId.toString() + "/sections/stationId=" + stationId)
+                          .when().delete("/lines/" + lineId.toString() + "/sections?stationId=" + stationId)
                           .then().log().all()
                           .extract();
     }
