@@ -18,7 +18,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.line.LineRequest;
 
-
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -48,14 +47,14 @@ class SectionAcceptanceTest {
     @Test
     void createSectionSuccess() {
         // Given
-        Map<String, Object> createSectionInfoParam = givenParameterWithCorrectStationInfo();
+        Map<String, Object> createSectionInfoParam = givenParameterWithCorrectSectionCreationInfo();
         // When
         ExtractableResponse<Response> response = createSection(createSectionInfoParam);
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    Map<String, Object> givenParameterWithCorrectStationInfo() {
+    Map<String, Object> givenParameterWithCorrectSectionCreationInfo() {
         return Map.of("downStationId", stationId3, "upStationId", stationId2, "distance", 10);
     }
 
@@ -106,11 +105,35 @@ class SectionAcceptanceTest {
      * Then: 구간이 정상적으로 제거된다.
      */
 
+    @DisplayName("지하철 구간 제거 성공")
+    @Test
+    void deleteSectionSuccess() {
+        // Given
+        Map<String, Object> createSectionInfoParam = givenParameterWithSectionCreationInfo();
+        createSection(createSectionInfoParam);
+        Long stationToDelete = stationId3;
+        // When
+        ExtractableResponse<Response> response = deleteSection(stationToDelete);
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
     /**
-     * Given: 지하철 노선에 한개의 구간 만 갖고 있을 때,
+     * Given: 지하철 노선에 한 개의 구간 만 갖고 있을 때,
      * When: 구간을 제거하면
      * Then: 오류가 발생한다.
      */
+
+    @DisplayName("지하철 구간 제거 실패 - 구간이 1개 이하일 때")
+    @Test
+    void deleteSectionFail1() {
+        // Given
+        Long stationToDelete = stationId2;
+        // When
+        ExtractableResponse<Response> response = deleteSection(stationToDelete);
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given: 제거하려는 구간이 노선의 마지막 구간이 아닐 때,
@@ -118,13 +141,22 @@ class SectionAcceptanceTest {
      * Then: 오류가 발생한다.
      */
 
+    @DisplayName("지하철 구간 제거 실패 - 하행 종점역이 아닐 때")
+    @Test
+    void deleteSectionFail2() {
+        // Given
+        Map<String, Object> createSectionInfoParam = givenParameterWithSectionCreationInfo();
+        createSection(createSectionInfoParam);
+        Long stationToDelete = stationId2;
+        // When
+        ExtractableResponse<Response> response = deleteSection(stationToDelete);
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
-
-
-
-
-
-
+    Map<String, Object> givenParameterWithSectionCreationInfo() {
+        return Map.of("downStationId", stationId3, "upStationId", stationId2, "distance", 10);
+    }
 
     ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> station = Map.of("name", stationName);
@@ -160,6 +192,13 @@ class SectionAcceptanceTest {
                           .body(createSectionInfoParam)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when().post("/lines/" + lineId.toString() + "/sections")
+                          .then().log().all()
+                          .extract();
+    }
+
+    ExtractableResponse<Response> deleteSection(Long stationId) {
+        return RestAssured.given().log().all()
+                          .when().delete("/lines/" + lineId.toString() + "/sections/stationId=" + stationId)
                           .then().log().all()
                           .extract();
     }
