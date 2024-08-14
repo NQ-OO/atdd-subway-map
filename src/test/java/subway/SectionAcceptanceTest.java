@@ -7,14 +7,21 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.line.LineRequest;
 
+
+@DisplayName("노선 관련 기능")
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class SectionAcceptanceTest {
 
     private Long stationId1;
@@ -45,11 +52,11 @@ class SectionAcceptanceTest {
         // When
         ExtractableResponse<Response> response = createSection(createSectionInfoParam);
         // Then
-        assertThat(response.statusCode()).isNotEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     Map<String, Object> givenParameterWithCorrectStationInfo() {
-        return Map.of("downStationId", stationId1, "upStationId", stationId2, "distance", 10);
+        return Map.of("downStationId", stationId3, "upStationId", stationId2, "distance", 10);
     }
 
     /**
@@ -65,7 +72,7 @@ class SectionAcceptanceTest {
         // When
         ExtractableResponse<Response> response = createSection(createSectionInfoParam);
         // Then
-        assertThat(response.statusCode()).isNotEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     Map<String, Object> givenParameterWithInconsistentUpStationInfo() {
@@ -86,7 +93,7 @@ class SectionAcceptanceTest {
         // When
         ExtractableResponse<Response> response = createSection(createSectionInfoParam);
         // Then
-        assertThat(response.statusCode()).isNotEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     Map<String, Object> givenParameterWithDuplicateDownStationInfo() {
