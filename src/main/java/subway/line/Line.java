@@ -21,13 +21,10 @@ public class Line {
     private Long id;
     @Column(length = 20, nullable = false)
     private String name;
-
     @Column(length = 20, nullable = false)
     private String color;
-
     @Embedded
     private Sections sections;
-
     @ManyToOne
     @JoinColumn(name = "up_station_id", nullable = false)
     private Station upStation;
@@ -38,12 +35,10 @@ public class Line {
 
     public Line() {}
 
-    public Line(String name, String color, Sections sections, Station upStation, Station downStation) {
+    public Line(String name, String color, Sections sections) {
         this.name = name;
         this.color = color;
         this.sections = sections;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
     public Long getId() {
@@ -62,40 +57,16 @@ public class Line {
         return sections;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    private void setDownStation(Station downStation) {
-        this.downStation = downStation;
-    }
-
     public void updateLine(LineRequest lineRequest) {
         name = lineRequest.getName();
         color = lineRequest.getColor();
     }
 
     public void addSection(Section section) {
-        sections.addSection(section, downStation);
-        setDownStation(section.getDownStation());
+        sections.addSection(section);
     }
 
-    public Section deleteSection(Station station) {
-        if (!isRemovableSection(station)) {
-            throw new IllegalStateException("구간을 제거할 수 없습니다.");
-        }
-        Section deletedSection = sections.deleteSection();
-        setDownStation(deletedSection.getUpStation());
-        return deletedSection;
+    public Section deleteSection(Station toRemoveStation) {
+        return sections.deleteSection(toRemoveStation);
     }
-
-    private boolean isRemovableSection(Station station) {
-        Section lastSection = sections.getLastSection();
-        return sections.size() > 1 && lastSection.getDownStation().equals(station);
-    }
-
 }

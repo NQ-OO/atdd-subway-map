@@ -50,4 +50,8 @@ public class Section {
         return List.of(upStation, downStation);
     }
 
+    public boolean contains(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
 }

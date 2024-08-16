@@ -1,5 +1,7 @@
 package subway.section;
 
+import java.util.function.Supplier;
+
 import org.springframework.stereotype.Service;
 
 import subway.line.Line;
@@ -20,13 +22,17 @@ public class SectionService {
     }
 
     public void addSection(Long lineId, SectionRequest sectionRequest) {
-        Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
-        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(IllegalArgumentException::new);
-        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(IllegalArgumentException::new);
+        Line line = lineRepository.findById(lineId).orElseThrow(exceptionSupplier("유효하지 않은 노선 ID: " + lineId));
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(exceptionSupplier("유효하지 않은 상행역 ID: " + sectionRequest.getUpStationId()));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(exceptionSupplier("유효하지 않은 하행역 ID: " + sectionRequest.getDownStationId()));
         Section section = new Section(upStation, downStation, Long.valueOf(sectionRequest.getDistance()));
         line.addSection(section);
         sectionRepository.save(section);
         lineRepository.save(line);
+    }
+
+    private static Supplier<IllegalArgumentException> exceptionSupplier(String errorMessage) {
+        return () -> new IllegalArgumentException(errorMessage);
     }
 
     public void deleteSection(Long lineId, Long stationId) {

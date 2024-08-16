@@ -34,15 +34,15 @@ public class Sections {
     }
 
     public boolean checkDuplicateStation(Station stationToCheck) {
-        return toStationList().stream().anyMatch(station -> station.equals(stationToCheck));
+        return sections.stream().anyMatch(section -> section.contains(stationToCheck));
     }
 
-    public void addSection(Section section, Station lineDownStation) {
-        validationCheck(section, lineDownStation);
+    public void addSection(Section section) {
+        validationCheck(section);
         sections.add(section);
     }
 
-    public Section getLastSection() {
+    private Section getLastSection() {
         return sections.get(size() - 1);
     }
 
@@ -50,19 +50,27 @@ public class Sections {
         return sections.size();
     }
 
-    public Section deleteSection() {
+    public Section deleteSection(Station toRemoveStation) {
+        if (!isRemovableSection(toRemoveStation)) {
+            throw new IllegalStateException("구간을 제거할 수 없습니다.");
+        }
         Section lastSection = getLastSection();
         sections.remove(lastSection);
         return lastSection;
     }
 
-    private void validationCheck(Section section, Station lineDownStation) {
-        checkConnectivity(section.getUpStation(), lineDownStation);
+    private boolean isRemovableSection(Station toRemoveStation) {
+        Section lastSection = getLastSection();
+        return sections.size() > 1 && lastSection.getDownStation().equals(toRemoveStation);
+    }
+
+    private void validationCheck(Section section) {
+        checkConnectivity(section.getUpStation(), getLastSection().getDownStation());
         checkIfThereAreNoDuplicateStation(section.getDownStation());
     }
 
-    private void checkConnectivity(Station sectionUpStation, Station lineDownStation) {
-        if (!sectionUpStation.equals(lineDownStation)) {
+    private void checkConnectivity(Station toAddSectionUpStation, Station lineDownStation) {
+        if (!toAddSectionUpStation.equals(lineDownStation)) {
             throw new IllegalStateException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
         }
     }

@@ -27,7 +27,7 @@ public class LineService {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(IllegalArgumentException::new);
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(IllegalArgumentException::new);
         Section newSection = sectionRepository.save(new Section(upStation, downStation, lineRequest.getDistance()));
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), new Sections(newSection), upStation, downStation));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), new Sections(newSection)));
         return new LineResponse(line);
     }
 
