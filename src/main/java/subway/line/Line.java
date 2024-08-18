@@ -25,13 +25,6 @@ public class Line {
     private String color;
     @Embedded
     private Sections sections;
-    @ManyToOne
-    @JoinColumn(name = "up_station_id", nullable = false)
-    private Station upStation;
-
-    @ManyToOne
-    @JoinColumn(name = "down_station_id", nullable = false)
-    private Station downStation;
 
     public Line() {}
 

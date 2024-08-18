@@ -51,17 +51,18 @@ public class Sections {
     }
 
     public Section deleteSection(Station toRemoveStation) {
-        if (!isRemovableSection(toRemoveStation)) {
-            throw new IllegalStateException("구간을 제거할 수 없습니다.");
-        }
         Section lastSection = getLastSection();
+        validateRemovableSection(lastSection, toRemoveStation);
         sections.remove(lastSection);
         return lastSection;
     }
 
-    private boolean isRemovableSection(Station toRemoveStation) {
-        Section lastSection = getLastSection();
-        return sections.size() > 1 && lastSection.getDownStation().equals(toRemoveStation);
+    private void validateRemovableSection(Section lastSection, Station toRemoveStation) {
+        boolean isSingleSection = sections.size() <= 1;
+        boolean isDifferentStation = !lastSection.getDownStation().equals(toRemoveStation);
+        if (isSingleSection || isDifferentStation) {
+            throw new IllegalStateException("구간을 제거할 수 없습니다.");
+        }
     }
 
     private void validationCheck(Section section) {

@@ -23,19 +23,19 @@ import subway.line.LineRequest;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class SectionAcceptanceTest {
 
-    private Long stationId1;
-    private Long stationId2;
-    private Long stationId3;
-    private Long stationId4;
+    private Long 사당;
+    private Long 방배;
+    private Long 서초;
+    private Long 교대;
     private Long lineId;
 
     @BeforeEach
     void init() {
-        stationId1 = getStationId(createStation("station1"));
-        stationId2 = getStationId(createStation("station2"));
-        stationId3 = getStationId(createStation("station3"));
-        stationId4 = getStationId(createStation("station4"));
-        lineId = getLineId(createLine(new LineRequest("사당", "red", stationId1, stationId2, 10L)));
+        사당 = getStationId(createStation("station1"));
+        방배 = getStationId(createStation("station2"));
+        서초 = getStationId(createStation("station3"));
+        교대 = getStationId(createStation("station4"));
+        lineId = getLineId(createLine(new LineRequest("사당", "red", 사당, 방배, 10L)));
     }
 
     /**
@@ -55,7 +55,7 @@ class SectionAcceptanceTest {
     }
 
     Map<String, Object> givenParameterWithCorrectSectionCreationInfo() {
-        return Map.of("downStationId", stationId3, "upStationId", stationId2, "distance", 10);
+        return Map.of("downStationId", 서초, "upStationId", 방배, "distance", 10);
     }
 
     /**
@@ -75,7 +75,7 @@ class SectionAcceptanceTest {
     }
 
     Map<String, Object> givenParameterWithInconsistentUpStationInfo() {
-        return Map.of("downStationId", stationId4, "upStationId", stationId3, "distance", 10);
+        return Map.of("downStationId", 교대, "upStationId", 서초, "distance", 10);
     }
 
     /**
@@ -96,7 +96,7 @@ class SectionAcceptanceTest {
     }
 
     Map<String, Object> givenParameterWithDuplicateDownStationInfo() {
-        return Map.of("downStationId", stationId1, "upStationId", stationId2, "distance", 10);
+        return Map.of("downStationId", 사당, "upStationId", 방배, "distance", 10);
     }
 
     /**
@@ -111,7 +111,7 @@ class SectionAcceptanceTest {
         // Given
         Map<String, Object> createSectionInfoParam = givenParameterWithSectionCreationInfo();
         createSection(createSectionInfoParam);
-        Long stationToDelete = stationId3;
+        Long stationToDelete = 서초;
         // When
         ExtractableResponse<Response> response = deleteSection(stationToDelete);
         // Then
@@ -128,7 +128,7 @@ class SectionAcceptanceTest {
     @Test
     void deleteSectionFail1() {
         // Given
-        Long stationToDelete = stationId2;
+        Long stationToDelete = 방배;
         // When
         ExtractableResponse<Response> response = deleteSection(stationToDelete);
         // Then
@@ -147,7 +147,7 @@ class SectionAcceptanceTest {
         // Given
         Map<String, Object> createSectionInfoParam = givenParameterWithSectionCreationInfo();
         createSection(createSectionInfoParam);
-        Long stationToDelete = stationId2;
+        Long stationToDelete = 방배;
         // When
         ExtractableResponse<Response> response = deleteSection(stationToDelete);
         // Then
@@ -155,7 +155,7 @@ class SectionAcceptanceTest {
     }
 
     Map<String, Object> givenParameterWithSectionCreationInfo() {
-        return Map.of("downStationId", stationId3, "upStationId", stationId2, "distance", 10);
+        return Map.of("downStationId", 서초, "upStationId", 방배, "distance", 10);
     }
 
     ExtractableResponse<Response> createStation(String stationName) {
